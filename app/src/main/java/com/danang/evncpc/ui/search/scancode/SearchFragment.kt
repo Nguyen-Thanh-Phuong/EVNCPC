@@ -1,4 +1,4 @@
-package com.danang.evncpc.ui.search
+package com.danang.evncpc.ui.search.scancode
 
 import android.app.AlertDialog
 import android.content.DialogInterface
@@ -11,7 +11,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import com.danang.evncpc.R
+import com.danang.evncpc.ui.search.ResultQRCodeFragment
 import com.google.zxing.integration.android.IntentIntegrator
 
 // TODO: Rename parameter arguments, choose names that match
@@ -28,7 +31,8 @@ class SearchFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-    lateinit var root: View
+    private lateinit var root: View
+    lateinit var nav:NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +48,10 @@ class SearchFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         root = inflater.inflate(R.layout.fragment_search, container, false)
-
+        root.findViewById<Button>(R.id.btnNext).setOnClickListener {
+            nav=Navigation.findNavController(root)
+            nav.navigate(R.id.resultQRCodeFragment)
+        }
         setData()
         return root
     }
@@ -57,8 +64,7 @@ class SearchFragment : Fragment() {
 
     private fun scanCode()
     {
-        if(context==null)
-            Log.d("PROGRAMING","Not NUll");
+        
         val integrator = IntentIntegrator.forSupportFragment(this)
         integrator.apply {
             captureActivity = ScanCodeAct::class.java
@@ -75,25 +81,28 @@ class SearchFragment : Fragment() {
         {
             if(result.contents != null)
             {
-                Log.d("MAINN",result.contents);
-                val builder = AlertDialog.Builder(activity)
-                builder.setMessage(result.contents)
-                builder.setTitle("Scanning Result")
-                builder.setPositiveButton("Scan Again",object : DialogInterface.OnClickListener
-                {
-                    override fun onClick(p0: DialogInterface?, p1: Int) {
-                        scanCode();
-                    }
-
-                })
-                builder.setNegativeButton("Finish",object : DialogInterface.OnClickListener
-                {
-                    override fun onClick(p0: DialogInterface?, p1: Int) {
-                        p0?.dismiss()
-                    }
-                })
-                var dialog = builder.create()
-                dialog.show()
+                Toast.makeText(context,result.contents,Toast.LENGTH_SHORT).show()
+                ResultQRCodeFragment.url = result.contents
+                nav=Navigation.findNavController(root)
+                nav.navigate(R.id.resultQRCodeFragment)
+//                val builder = AlertDialog.Builder(activity)
+//                builder.setMessage(result.contents)
+//                builder.setTitle("Scanning Result")
+//                builder.setPositiveButton("Scan Again",object : DialogInterface.OnClickListener
+//                {
+//                    override fun onClick(p0: DialogInterface?, p1: Int) {
+//                        scanCode();
+//                    }
+//
+//                })
+//                builder.setNegativeButton("Finish",object : DialogInterface.OnClickListener
+//                {
+//                    override fun onClick(p0: DialogInterface?, p1: Int) {
+//                        p0?.dismiss()
+//                    }
+//                })
+//                var dialog = builder.create()
+//                dialog.show()
             }
             else
             {
